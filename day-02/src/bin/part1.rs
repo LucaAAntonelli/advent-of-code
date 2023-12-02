@@ -1,5 +1,4 @@
-use std::collections::HashMap;
-
+use std::cmp::max;
 fn main() {
     let input = include_str!("./input1.txt");
     let output = part1(input);
@@ -8,11 +7,38 @@ fn main() {
 
 fn part1(input: &str) -> i32 {
     let mut lines = input.lines();
-    let mut balls = HashMap::new();
-    balls.insert("red", "12");
-    balls.insert("blue", "14");
-    balls.insert("green", "13");
-    while let Some(line) = lines.next() {}
+    let bag_red = 12;
+    let bag_green = 13;
+    let bag_blue = 14;
+    let mut sum = 0;
+    let mut game = 0;
+    while let Some(line) = lines.next() {
+        // Split string on semicolons
+        game += 1;
+        let mut game_red = 0;
+        let mut game_green = 0;
+        let mut game_blue = 0;
+        for part in line.split(";").into_iter() {
+            let vec: Vec<&str> = part.split(" ").collect();
+            if let Some(red_index) = vec.iter().position(|&r| r == "red") {
+                game_red = max(game_red, vec.get(red_index - 1).unwrap().parse().unwrap());
+            }
+            if let Some(green_index) = vec.iter().position(|&r| r == "green") {
+                game_green = max(
+                    game_green,
+                    vec.get(green_index - 1).unwrap().parse().unwrap(),
+                );
+            }
+            if let Some(blue_index) = vec.iter().position(|&r| r == "blue") {
+                game_blue = max(game_blue, vec.get(blue_index - 1).unwrap().parse().unwrap());
+            }
+        }
+        if game_red <= bag_red && game_blue <= bag_blue && game_green <= bag_green {
+            println!("Game: {game}, red: {game_red}, green: {game_green}, blue: {game_blue}");
+            sum += game;
+        }
+    }
+    sum
 }
 
 #[cfg(test)]
