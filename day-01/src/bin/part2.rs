@@ -1,4 +1,3 @@
-use std::cmp;
 use std::str;
 
 fn main() {
@@ -7,70 +6,51 @@ fn main() {
     dbg!(output);
 }
 
-fn find_first_spelled_out_value(line: &str) -> Option<(usize, usize)> {
-    let spelled_out_values = vec![
-        "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "zero",
+fn part2(input: &str) -> i32 {
+    let numbers_spelled_out_with_letters = [
+        "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
     ];
-    for (pos, value) in spelled_out_values.iter().enumerate() {
-        if let Some(index) = line.find(value) {
-            return Some((index, pos));
-        }
-    }
-    None
-}
 
-fn find_last_spelled_out_value(line: &str) -> Option<(usize, usize)> {
-    let spelled_out_values = vec![
-        "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
-    ];
-    for (pos, value) in spelled_out_values.iter().enumerate() {
-        if let Some(index) = line.rfind(value) {
-            return Some((index, pos));
-        }
-    }
-    None
-}
+    input
+        .lines()
+        .map(|line| {
+            let mut characters_digits: Vec<char> = vec![];
+            let mut temporary = String::from("");
+            for character in line.chars() {
+                temporary += &character.to_string();
 
-fn part2(input: &str) -> String {
-    let mut lines = input.lines();
-    let mut sum = 0;
-    let numeric_values: Vec<char> = "0123456789".chars().collect();
-    let mut first_digit = String::from("");
-    let mut last_digit = String::from("");
+                let mut temporary_spelled_number_index = None;
+                for (index, spelled_number) in numbers_spelled_out_with_letters.iter().enumerate() {
+                    if temporary.contains(spelled_number) {
+                        temporary_spelled_number_index = Some(index);
+                        break;
+                    }
+                }
+                if let Some(temporary_spelled_number_index) = temporary_spelled_number_index {
+                    let number = temporary_spelled_number_index + 1;
+                    characters_digits.push(
+                        number
+                            .to_string()
+                            .chars()
+                            .next()
+                            .expect("Number should be single-character digit."),
+                    );
+                    temporary = character.to_string();
+                }
 
-    while let Some(line) = lines.next() {
-        // Find first numeric value
-        let first_numeric = line.find(|x| numeric_values.contains(&x)).unwrap();
-        if let Some((first_spelled, val_first_spelled)) = find_first_spelled_out_value(line) {
-            if first_spelled < first_numeric {
-                first_digit = val_first_spelled.to_string();
-            } else {
-                first_digit = str::from_utf8(&vec![line.as_bytes()[first_numeric]])
-                    .unwrap()
-                    .to_owned();
+                if character.is_ascii_digit() {
+                    characters_digits.push(character);
+                    temporary = String::from("");
+                }
             }
-        }
-        // Find last numeric value
-        let last_numeric = line.rfind(|x| numeric_values.contains(&x)).unwrap();
-        if let Some((last_spelled, val_last_spelled)) = find_last_spelled_out_value(line) {
-            if last_spelled > last_numeric {
-                last_digit = val_last_spelled.to_string();
-            } else {
-                last_digit = str::from_utf8(&vec![line.as_bytes()[last_numeric]])
-                    .unwrap()
-                    .to_owned();
-            }
-        }
-        // Combine to string
 
-        let calibration_value = format!("{}{}", first_digit, last_digit);
-        println!("{calibration_value}");
-        // Parse to int
-        sum += calibration_value.parse::<i32>().unwrap();
-        // Add to sum
-    }
-
-    sum.to_string()
+            let first_digit = characters_digits.first().unwrap_or(&'0').to_owned();
+            let last_digit = characters_digits.last().unwrap_or(&'0').to_owned();
+            let number = format!("{}{}", first_digit, last_digit);
+            let number: i32 = number.parse().expect("Should parse as a number.");
+            number
+        })
+        .sum()
 }
 
 #[cfg(test)]
@@ -89,6 +69,6 @@ mod tests {
             zoneight234
             7pqrstsixteen",
         );
-        assert_eq!(result, "281");
+        assert_eq!(result, 281);
     }
 }
