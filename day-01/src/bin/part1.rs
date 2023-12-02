@@ -28,7 +28,7 @@ fn part1(input: &str) -> String {
         // Add to sum
     }
 
-    sum.to_string
+    sum.to_string()
 }
 
 #[cfg(test)]
