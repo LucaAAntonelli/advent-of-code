@@ -19,7 +19,8 @@ fn part1(input: &str) -> i32 {
         let mut game_green = 0;
         let mut game_blue = 0;
         for part in line.split(";").into_iter() {
-            let vec: Vec<&str> = part.split(" ").collect();
+            let stripped_part = part.replace(",", "");
+            let vec: Vec<&str> = stripped_part.split(" ").collect();
             if let Some(red_index) = vec.iter().position(|&r| r == "red") {
                 game_red = max(game_red, vec.get(red_index - 1).unwrap().parse().unwrap());
             }
@@ -34,7 +35,6 @@ fn part1(input: &str) -> i32 {
             }
         }
         if game_red <= bag_red && game_blue <= bag_blue && game_green <= bag_green {
-            println!("Game: {game}, red: {game_red}, green: {game_green}, blue: {game_blue}");
             sum += game;
         }
     }
