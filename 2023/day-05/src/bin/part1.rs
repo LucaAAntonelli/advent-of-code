@@ -1,11 +1,52 @@
+use std::collections::HashMap;
+
 fn main() {
     let input = include_str!("./input.txt");
     let output = part1(input);
     dbg!(output);
 }
 
+struct Mapper {
+    seeds: Vec<i32>,
+    seed_to_soil: HashMap<i32, i32>,
+    soil_to_fertilizer: HashMap<i32, i32>,
+    fertilizer_to_water: HashMap<i32, i32>,
+    water_to_light: HashMap<i32, i32>,
+    light_to_temperature: HashMap<i32, i32>,
+    temperature_to_humidity: HashMap<i32, i32>,
+    humidity_to_location: HashMap<i32, i32>,
+}
+
+impl Default for Mapper {
+    fn default() -> Self {
+        Self {
+            seeds: vec![0],
+            seed_to_soil: HashMap::from([(0, 0)]),
+            soil_to_fertilizer: HashMap::from([(0, 0)]),
+            fertilizer_to_water: HashMap::from([(0, 0)]),
+            water_to_light: HashMap::from([(0, 0)]),
+            light_to_temperature: HashMap::from([(0, 0)]),
+            temperature_to_humidity: HashMap::from([(0, 0)]),
+            humidity_to_location: HashMap::from([(0, 0)]),
+        }
+    }
+}
+
+impl Mapper {
+    pub fn new(input: &str) -> Self {
+        let parts: Vec<&str> = input.split("\n").collect();
+        for (idx, part) in parts.iter().enumerate() {
+            println!("{idx}: {part}");
+        }
+        Self::default()
+    }
+}
+
 fn part1(input: &str) -> i32 {
-    todo!()
+    let mut result = 0;
+    let mapper = Mapper::new(input);
+
+    result
 }
 
 #[cfg(test)]
