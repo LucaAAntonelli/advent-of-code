@@ -1,4 +1,4 @@
-use std::collections::{hash_set, HashSet};
+use std::collections::HashSet;
 fn main() {
     let input = include_str!("./input.txt");
     let output = part1(input);
