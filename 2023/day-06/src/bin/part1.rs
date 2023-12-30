@@ -1,10 +1,26 @@
+use regex::Regex;
 fn main() {
     let input = include_str!("./input.txt");
     let output = part1(input);
     dbg!(output);
 }
 
+struct Race {
+    time: u32,
+    current_record: u32
+}
+
 fn part1(input: &str) -> i32 {
+    let re = Regex::new(r"\d+").unwrap();
+    let line_1 = input.split("\n").collect::<Vec<&str>>()[0];
+    let line_2 = input.split("\n").collect::<Vec<&str>>()[1];
+    let times = re.find_iter(line_1).map(|x| x.as_str().parse::<u32>().unwrap()).collect::<Vec<_>>();
+
+    let records = re.find_iter(line_2).map(|x| x.as_str().parse::<u32>().unwrap()).collect::<Vec<_>>();
+
+    dbg!(times);
+    dbg!(records);
+
     todo!()
 }
 
@@ -16,41 +32,9 @@ mod tests {
     #[test]
     fn it_works() {
         let result = part1(
-            "seeds: 79 14 55 13
-
-        seed-to-soil map:
-        50 98 2
-        52 50 48
-        
-        soil-to-fertilizer map:
-        0 15 37
-        37 52 2
-        39 0 15
-        
-        fertilizer-to-water map:
-        49 53 8
-        0 11 42
-        42 0 7
-        57 7 4
-        
-        water-to-light map:
-        88 18 7
-        18 25 70
-        
-        light-to-temperature map:
-        45 77 23
-        81 45 19
-        68 64 13
-        
-        temperature-to-humidity map:
-        0 69 1
-        1 0 69
-        
-        humidity-to-location map:
-        60 56 37
-        56 93 4
-        ",
+            "Time:      7  15   30
+            Distance:  9  40  200",
         );
-        assert_eq!(result, 35);
+        assert_eq!(result, 288);
     }
 }
