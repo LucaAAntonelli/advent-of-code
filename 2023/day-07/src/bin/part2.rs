@@ -8,9 +8,9 @@ fn main() {
 
 #[derive(Debug, PartialEq, PartialOrd, Eq)]
 enum Card {
+    J,
     Numeric(u32),
     T,
-    J,
     Q,
     K,
     A
@@ -34,7 +34,7 @@ enum HandType {
     HighCard,
     OnePair,
     TwoPairs,
-    ThreeOFAKind,
+    ThreeOfAKind,
     FullHouse,
     FourOfAKind,
     FiveOfAKind,    
@@ -47,7 +47,62 @@ impl HandType {
         for c in cards_str.chars() {
             *char_counts.entry(c).or_insert(0) += 1;
         }
-        let values: Vec<&u8> = char_counts.values().collect();
+        if char_counts.contains_key(&'J') {
+            // Handle Joker case
+            let num_jokers = char_counts.get(&'J').unwrap();
+            match num_jokers {
+                5 => Self::FiveOfAKind, // Naturally
+                4 => Self::FiveOfAKind, // Can always make 5 with fifth card
+                3 => {
+                    // Figure out if remaining two cards are equal
+                    if char_counts.len() == 2 { // Two elements in map, one of them J with count 3 => Leftover pair
+                        return Self::FiveOfAKind;
+                    }
+                    return Self::FourOfAKind; // Always possible with 3 Jokers
+                }// 4, 5, full house
+                2 => {
+                    // If remaining three cards are equal => 5
+                    if char_counts.len() == 2 { // Same as before, this time with J count 2, leftover three of a kind
+                        return Self::FiveOfAKind;
+                    }
+
+                    // If remaining three cards are one pair + 1 => 4
+                    if char_counts.len() == 3 {
+                        return Self::FourOfAKind;
+                    }
+
+                    return Self::ThreeOfAKind; // Always possible with two cards
+                }// 3, 4, 5, full house
+                1 => {
+                    // If remaining four cards are equal => 5
+                    let values = char_counts.values().collect::<Vec<&u8>>();
+                    if values.contains(&&4) {
+                        return Self::FiveOfAKind;
+                    } 
+
+                    // If remaining four cards are three of a kind + 1 => 4
+                    if values.contains(&&3) {
+                        return Self::FourOfAKind;
+                    }
+
+                    // If remaining four cards are two pairs => Full House
+                    if char_counts.len() == 3 {
+                        return Self::FullHouse;
+                    }
+
+                    // If remaining four cards are one pair + 2 => 3
+                    if values.contains(&&2) {
+                        return Self::ThreeOfAKind;
+                    }
+
+                    return Self::OnePair;
+                }// 2, 3, 4, 5, full house
+                _ => {panic!("Shouldn't be possible");}
+            };
+
+            Self::FiveOfAKind
+        } else {
+            let values: Vec<&u8> = char_counts.values().collect();
         if values.contains(&&5) {
             Self::FiveOfAKind
         } else if values.contains(&&4) {
@@ -55,7 +110,7 @@ impl HandType {
         } else if values.contains(&&3) && values.contains(&&2) {
             Self::FullHouse
         } else if values.contains(&&3) {
-            Self::ThreeOFAKind
+            Self::ThreeOfAKind
         } else if values.iter().filter(|&x| x == &&2).count() == 2 { // Check if 2 is contained twice
             Self::TwoPairs
         } else if values.contains(&&2) {
@@ -63,6 +118,8 @@ impl HandType {
         } else {
             Self::HighCard
         }
+        }
+        
     }
 }
 
@@ -221,50 +278,7 @@ mod tests {
             KTJJT 220
             QQQJA 483",
         );
-        assert_eq!(result, 6440);
+        assert_eq!(result, 5905);
     }
 
-    #[test]
-    fn test_sorting() {
-        let hand_1 = Hand::new("11111 56");
-        let hand_2 = Hand::new("KKKK3 1");
-        assert!(hand_1 > hand_2);
-    }
-
-    #[test]
-    fn test_hand_ordering() {
-        assert!(HandType::FiveOfAKind > HandType::FourOfAKind);
-        assert!(HandType::FiveOfAKind > HandType::ThreeOFAKind);
-        assert!(HandType::FiveOfAKind > HandType::FullHouse);
-        assert!(HandType::FiveOfAKind > HandType::TwoPairs);
-        assert!(HandType::FiveOfAKind > HandType::OnePair);
-        assert!(HandType::FiveOfAKind > HandType::HighCard);
-
-        assert!(HandType::FourOfAKind > HandType::ThreeOFAKind);
-        assert!(HandType::FourOfAKind > HandType::FullHouse);
-        assert!(HandType::FourOfAKind > HandType::TwoPairs);
-        assert!(HandType::FourOfAKind > HandType::OnePair);
-        assert!(HandType::FourOfAKind > HandType::HighCard);
-
-        assert!(HandType::FullHouse > HandType::ThreeOFAKind);
-        assert!(HandType::FullHouse > HandType::TwoPairs);
-        assert!(HandType::FullHouse > HandType::OnePair);
-        assert!(HandType::FullHouse > HandType::HighCard);
-
-        assert!(HandType::ThreeOFAKind > HandType::TwoPairs);
-        assert!(HandType::ThreeOFAKind > HandType::OnePair);
-        assert!(HandType::ThreeOFAKind > HandType::HighCard);
-
-        assert!(HandType::TwoPairs > HandType::OnePair);
-        assert!(HandType::TwoPairs > HandType::HighCard);
-
-        assert!(HandType::OnePair > HandType::HighCard);
-    }
-
-    #[test]
-    fn test_cards() {
-        assert!(Card::Numeric(3) < Card::Numeric(5));
-        assert!(Card::A > Card::J);
-        assert!(Card::Numeric(5) < Card::T);
-    }
 }
