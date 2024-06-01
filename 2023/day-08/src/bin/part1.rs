@@ -1,11 +1,36 @@
+use std::collections::HashMap;
+
 fn main() {
     let input = include_str!("./input.txt");
     let output = part1(input);
     dbg!(output);
 }
 
-fn part1(input: &str) -> i32 {
-    todo!()
+
+fn part1(input: &str) -> usize {
+    let lines = input.lines().into_iter().collect::<Vec<&str>>();
+    let instructions = lines[0].chars().collect::<Vec<char>>();
+    let mut map: HashMap<&str, (String, String)> = HashMap::new();
+    for line in lines[2..].iter() {
+        let mut parts = line.split("=");
+        let key = parts.next().unwrap().trim();
+        let value = parts.next().unwrap().trim().split(",").collect::<Vec<&str>>();
+        let value_left = value[0].replace("(", "");
+        let value_right = value[1].trim().replace(")", "").to_string();
+        map.insert(key, (value_left, value_right));
+    }
+    let mut steps = 0;
+    let mut current = "AAA";
+    while current != "ZZZ" {
+        let instruction = instructions[steps % instructions.len()];
+        if instruction == 'R' {
+            current = map.get(current).unwrap().1.as_str();
+        } else {
+            current = map.get(current).unwrap().0.as_str();
+        }
+        steps += 1;
+    }
+    steps
 }
 
 #[cfg(test)]
@@ -16,41 +41,28 @@ mod tests {
     #[test]
     fn it_works() {
         let result = part1(
-            "seeds: 79 14 55 13
+            "RL
 
-        seed-to-soil map:
-        50 98 2
-        52 50 48
-        
-        soil-to-fertilizer map:
-        0 15 37
-        37 52 2
-        39 0 15
-        
-        fertilizer-to-water map:
-        49 53 8
-        0 11 42
-        42 0 7
-        57 7 4
-        
-        water-to-light map:
-        88 18 7
-        18 25 70
-        
-        light-to-temperature map:
-        45 77 23
-        81 45 19
-        68 64 13
-        
-        temperature-to-humidity map:
-        0 69 1
-        1 0 69
-        
-        humidity-to-location map:
-        60 56 37
-        56 93 4
-        ",
+            AAA = (BBB, CCC)
+            BBB = (DDD, EEE)
+            CCC = (ZZZ, GGG)
+            DDD = (DDD, DDD)
+            EEE = (EEE, EEE)
+            GGG = (GGG, GGG)
+            ZZZ = (ZZZ, ZZZ)",
         );
-        assert_eq!(result, 35);
+        assert_eq!(result, 2);
+    }
+
+    #[test]
+    fn it_works_2() {
+        let result = part1(
+            "LLR
+
+            AAA = (BBB, BBB)
+            BBB = (AAA, ZZZ)
+            ZZZ = (ZZZ, ZZZ)",
+        );
+        assert_eq!(result, 6);
     }
 }
