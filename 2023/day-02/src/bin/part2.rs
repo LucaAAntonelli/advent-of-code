@@ -1,7 +1,7 @@
 use std::{cmp::max, str};
 
 fn main() {
-    let input = include_str!("./input.txt");
+    let input = include_str!("../../../../advent-of-code-input/2023/day-02.txt");
     let output = part2(input);
     dbg!(output);
 }

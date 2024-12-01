@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use itertools::Itertools;
 
 fn main() {
-    println!("{:?}", gear_ratios(include_str!("./input.txt")));
+    println!("{:?}", gear_ratios(include_str!("../../../../advent-of-code-input/2023/day-03.txt")));
 }
 
 fn get_neighbor_labels(pos: usize, array_width: usize, pos_to_label: &HashMap<usize, usize>) -> Vec<&usize> {
@@ -71,7 +71,7 @@ fn gear_ratios(data_raw: &str) -> (usize, usize) {
 
 
 pub fn day03() -> (usize, usize) {
-    let data = include_str!("./input.txt");
+    let data = include_str!("../../../../advent-of-code-input/2023/day-03.txt");
     gear_ratios(&data)
 }
 

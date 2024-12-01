@@ -10,7 +10,7 @@ use nom::{
 use nom_supreme::{tag::complete::tag, ParserExt};
 
 fn main() {
-    let input = include_str!("./input.txt");
+    let input = include_str!("../../../../advent-of-code-input/2023/day-05.txt");
     let output = process(input).unwrap();
     dbg!(output);
 }

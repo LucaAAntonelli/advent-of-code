@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 fn main() {
-    let input = include_str!("./input.txt");
+    let input = include_str!("../../../../advent-of-code-input/2023/day-08.txt");
     let output = part1(input);
     dbg!(output);
 }

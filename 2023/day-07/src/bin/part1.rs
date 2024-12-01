@@ -1,7 +1,7 @@
 use std::{vec, collections::HashMap, cmp::Ordering};
 
 fn main() {
-    let input = include_str!("./input.txt");
+    let input = include_str!("../../../../advent-of-code-input/2023/day-07.txt");
     let output = part1(input);
     dbg!(output);
 }
