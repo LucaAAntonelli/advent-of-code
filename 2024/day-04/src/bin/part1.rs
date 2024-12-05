@@ -1,58 +1,70 @@
-fn part1(input: &str) -> u32 {
-    let mut occurrences = 0;
-    let mut character_array = vec![];
-    for row in input.split("\n").into_iter() {
-        character_array.push(row.chars().collect::<Vec<char>>());
-    }
-    let num_rows = character_array.len();
-    let num_cols = character_array[0].len();
+const XMAS: &str = "XMAS";
+const SENTINEL_CHAR: char = '~';
 
-    for row in 0..num_rows {
-        for col in 0..num_cols {
-            if is_xmas_here(&character_array, row, col) {
-                occurrences += 1;
+fn part1(input: &str) -> u64 {
+    let mut num_xmas = 0;
+    let mut word_search: Vec<_> = input
+        .lines()
+        .map(|x| x.chars().collect::<Vec<char>>())
+        .collect();
+    // pad word_search
+    let word_search_r = word_search.len();
+    let word_search_c = word_search[0].len();
+    for _ in 0..XMAS.len() {
+        word_search.insert(0, vec![SENTINEL_CHAR; word_search_c + 2 * XMAS.len()]);
+        word_search.push(vec![SENTINEL_CHAR; word_search_c + 2 * XMAS.len()]);
+    }
+    let word_search = word_search
+        .into_iter()
+        .map(|mut x| {
+            for _ in 0..XMAS.len() {
+                x.insert(0, SENTINEL_CHAR);
+                x.push(SENTINEL_CHAR);
+            }
+            x
+        })
+        .collect::<Vec<_>>();
+    for row_idx in XMAS.len()..XMAS.len() + word_search_r {
+        let row = word_search[row_idx].clone();
+        // horizontal forwards & backwards check
+        for window in row.windows(XMAS.len()) {
+            if &window.iter().collect::<String>() == XMAS
+                || &window.iter().rev().collect::<String>() == XMAS
+            {
+                num_xmas += 1;
+            }
+        }
+
+        // vertical & diagonal check
+        let mut vertical_window = [SENTINEL_CHAR; XMAS.len()];
+        let mut diagonal_down_window = [SENTINEL_CHAR; XMAS.len()];
+        let mut diagonal_up_window = [SENTINEL_CHAR; XMAS.len()];
+        for char_idx in XMAS.len()..XMAS.len() + word_search_c {
+            for i in 0..XMAS.len() {
+                vertical_window[i] = word_search[row_idx + i][char_idx];
+            }
+            if &vertical_window.iter().collect::<String>() == XMAS
+                || &vertical_window.iter().rev().collect::<String>() == XMAS
+            {
+                num_xmas += 1;
+            }
+            for i in 0..XMAS.len() {
+                diagonal_down_window[i] = word_search[row_idx + i][char_idx + i];
+                diagonal_up_window[i] = word_search[row_idx - i][char_idx + i];
+            }
+            if &diagonal_down_window.iter().collect::<String>() == XMAS
+                || &diagonal_down_window.iter().rev().collect::<String>() == XMAS
+            {
+                num_xmas += 1;
+            }
+            if &diagonal_up_window.iter().collect::<String>() == XMAS
+                || &diagonal_up_window.iter().rev().collect::<String>() == XMAS
+            {
+                num_xmas += 1;
             }
         }
     }
-    return occurrences;
-}
-
-fn is_xmas_here(array: &Vec<Vec<char>>, row: usize, col: usize) -> bool {
-    let word = "XMAS".chars().collect::<Vec<_>>();
-    if array[row][col] != word[0 as usize] {
-        return false;
-    }
-    let n = array.len();
-    let m = array[0].len();
-
-
-    let x: Vec<i32> = vec![-1, -1, -1, 0, 0, 1, 1, 1];
-    let y: Vec<i32> = vec![-1, 0, 1, -1, 1, -1, 0, 1];
-    let mut last_index = 0;
-
-    for dir in 0..8 {
-        let mut curr_x: i32 = row as i32 + x[dir];
-        let mut curr_y: i32 = col as i32 + y[dir];
-        for k in 1..word.len() {
-            last_index = k;
-            if curr_x >= n as i32 || curr_x < 0 || curr_y >= m as i32 || curr_y < 0 {
-                break;
-            }
-
-            if array[curr_x as usize][curr_y as usize] != word[k] {
-                break;
-            }
-            println!("row {curr_x}, column {curr_y}, letter {}", array[curr_x as usize][curr_y as usize]);
-            curr_x += x[dir];
-            curr_y += y[dir];
-        }
-        if last_index == word.len() - 1 {
-
-            return true;
-        }
-    }
-    return false;
-
+    num_xmas
 }
 
 fn main() {
