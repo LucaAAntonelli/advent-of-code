@@ -9,17 +9,15 @@ fn part1(input: &str) -> u32 {
 
     for row in 0..num_rows {
         for col in 0..num_cols {
-            if is_xmas_here(character_array.clone(), row, col) {
+            if is_xmas_here(&character_array, row, col) {
                 occurrences += 1;
             }
         }
     }
-
-
     return occurrences;
 }
 
-fn is_xmas_here(array: Vec<Vec<char>>, row: usize, col: usize) -> bool {
+fn is_xmas_here(array: &Vec<Vec<char>>, row: usize, col: usize) -> bool {
     let word = "XMAS".chars().collect::<Vec<_>>();
     if array[row][col] != word[0 as usize] {
         return false;
